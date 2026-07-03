@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Jumping Game</title>
+
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <h1>Jumping Game</h1>
+            <button id="startBtn">Start Game</button>
+        </div>
+
+        <!-- Game Container -->
+        <div class="game-container">
+
+            <h1>Jumping Game</h1>
+
+            <div class="top-bar">
+
+                <div class="score-board">
+                    Score: <span id="score">0</span>
+                </div>
+
+                <div class="high-score">
+                    High Score: <span id="highScore">0</span>
+                </div>
+
+            </div>
+
+            <div id="game">
+
+                <div id="character"></div>
+
+            </div>
+
+            <div class="controls">
+                ENTER = Start | SPACE = Jump | P = Pause | R = Restart
+            </div>
+
+            <button id="pauseBtn">Pause</button>
+            <button id="restartBtn">Restart</button>
+
+        </div>
+
+        <!-- Sounds -->
+        <audio id="jumpSound" src="./sounds/jump.wav"></audio>
+        <audio id="gameOverSound" src="./sounds/gameover.wav"></audio>
+        <audio id="bgMusic" src="./sounds/background.wav" loop></audio>
+
+        <script src="script.js"></script>
+
+    </body>
+
+</html>
