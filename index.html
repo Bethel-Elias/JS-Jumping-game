@@ -6,7 +6,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Jumping Game</title>
-
         <link rel="stylesheet" href="style.css">
     </head>
 
@@ -16,6 +15,16 @@
         <div id="startScreen">
             <h1>Jumping Game</h1>
             <button id="startBtn">Start Game</button>
+        </div>
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen">
+        
+            <h1>Game Over</h1>
+        
+            <h2>Your Score: <span id="finalScore">0</span></h2>
+        
+            <button id="playAgainBtn">Play Again</button>
+        
         </div>
 
         <!-- Game Container -->
@@ -56,7 +65,6 @@
         <audio id="bgMusic" src="./sounds/background.wav" loop></audio>
 
         <script src="script.js"></script>
-
     </body>
 
 </html>

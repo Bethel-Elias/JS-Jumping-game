@@ -19,6 +19,10 @@ const jumpSound = document.getElementById("jumpSound");
 const gameOverSound = document.getElementById("gameOverSound");
 const bgMusic = document.getElementById("bgMusic");
 
+const gameOverScreen = document.getElementById("gameOverScreen");
+const finalScore = document.getElementById("finalScore");
+const playAgainBtn = document.getElementById("playAgainBtn");
+
 
 // --------------------
 // Game Variables
@@ -298,7 +302,9 @@ function createObstacle() {
 
       gameOverSound.play();
 
-      alert("Game Over! Final Score: " + score);
+      finalScore.textContent = score;
+
+      gameOverScreen.style.display = "flex";
 
       // Save High Score
       if (score > highScore) {
@@ -359,6 +365,10 @@ pauseBtn.addEventListener("click", () => {
 
 restartBtn.addEventListener("click", () => {
 
+  restartGame();
+});
+
+playAgainBtn.addEventListener("click", () => {
   restartGame();
 });
 
