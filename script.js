@@ -40,7 +40,6 @@ let speed = 6;
 
 character.style.bottom = "5px";
 
-
 // --------------------
 // High Score
 // --------------------
@@ -48,7 +47,6 @@ character.style.bottom = "5px";
 let highScore = localStorage.getItem("highScore") || 0;
 
 highScoreDisplay.textContent = highScore;
-
 
 // --------------------
 // Start Game
@@ -66,7 +64,6 @@ function startGame() {
 
   createObstacle();
 }
-
 
 // --------------------
 // Character Animation
@@ -88,7 +85,6 @@ function animateCharacter() {
 
   }, 200);
 }
-
 
 // --------------------
 // Jump Function
@@ -136,7 +132,6 @@ function jump() {
   }, 20);
 }
 
-
 // --------------------
 // Pause Function
 // --------------------
@@ -148,7 +143,6 @@ function togglePause() {
   pauseBtn.textContent = paused ? "Resume" : "Pause";
 }
 
-
 // --------------------
 // Restart Game
 // --------------------
@@ -158,7 +152,6 @@ function restartGame() {
   location.reload();
 }
 
-
 // --------------------
 // Create Obstacles
 // --------------------
@@ -167,188 +160,275 @@ function createObstacle() {
 
   if (gameOver) return;
 
+  const obstacle = createObstacleElement();
+
+  game.appendChild(obstacle.element);
+
+  moveObstacle(obstacle);
+
+  spawnNextObstacle();
+}
+
+// --------------------
+// Create Obstacle Element
+// --------------------
+
+function createObstacleElement() {
+
   const obstacle = document.createElement("div");
 
   obstacle.classList.add("obstacle");
 
-  // --------------------
-  // Random Obstacle Types
-  // --------------------
+  let obstacleData = {
+    element: obstacle,
+    left: 900,
+    waveAngle: 0,
+    waveSpeed: 0,
+    waveHeight: 0,
+    baseHeight: 0
+  };
 
   const obstacleType = Math.random();
-
-  let waveAngle = 0;
-  let waveSpeed = 0;
-  let waveHeight = 0;
-  let baseHeight = 0;
 
   // CACTUS
   if (obstacleType < 0.4) {
 
-    obstacle.style.backgroundImage = 'url("./images/cactus.png")';
-
-    obstacle.style.height = "60px";
-    obstacle.style.width = "40px";
-
-    obstacle.style.bottom = "5px";
+    setCactusObstacle(obstacle);
   }
 
   // ROCK
   else if (obstacleType < 0.8) {
 
-    obstacle.style.backgroundImage = 'url("./images/rock.png")';
-
-    obstacle.style.height = "40px";
-    obstacle.style.width = "40px";
-
-    obstacle.style.bottom = "5px";
+    setRockObstacle(obstacle);
   }
 
-  // FLYING BIRD
+  // BIRD
   else {
 
-    obstacle.style.backgroundImage = 'url("./images/bird5.png")';
-
-    obstacle.style.height = "40px";
-    obstacle.style.width = "50px";
-
-    obstacle.style.transform = "scaleX(-1)";
-
-    obstacle.classList.add("flying");
-
-    // Random Bird Height
-    let baseHeight = Math.random() * 80 + 80;
-
-    obstacle.style.bottom = baseHeight + "px";
-
-    // Bird Wave Movement
-     waveAngle = 0;
-
-     waveSpeed = Math.random() * 0.15 + 0.05;
-
-     waveHeight = Math.random() * 30 + 20;
+    setBirdObstacle(obstacleData);
   }
 
-  game.appendChild(obstacle);
+  obstacle.style.left = obstacleData.left + "px";
 
-  let obstacleLeft = 900;
+  return obstacleData;
+}
 
-  obstacle.style.left = obstacleLeft + "px";
+// --------------------
+// Cactus Obstacle
+// --------------------
 
-  // --------------------
-  // Obstacle Movement
-  // --------------------
+function setCactusObstacle(obstacle) {
 
-  const moveObstacle = setInterval(() => {
+  obstacle.style.backgroundImage = 'url("./images/cactus.png")';
+
+  obstacle.style.height = "60px";
+  obstacle.style.width = "40px";
+
+  obstacle.style.bottom = "5px";
+}
+
+// --------------------
+// Rock Obstacle
+// --------------------
+
+function setRockObstacle(obstacle) {
+
+  obstacle.style.backgroundImage = 'url("./images/rock.png")';
+
+  obstacle.style.height = "40px";
+  obstacle.style.width = "40px";
+
+  obstacle.style.bottom = "5px";
+}
+
+// --------------------
+// Bird Obstacle
+// --------------------
+
+function setBirdObstacle(obstacleData) {
+
+  const obstacle = obstacleData.element;
+
+  obstacle.style.backgroundImage = 'url("./images/bird5.png")';
+
+  obstacle.style.height = "40px";
+  obstacle.style.width = "50px";
+
+  obstacle.style.transform = "scaleX(-1)";
+
+  obstacle.classList.add("flying");
+
+  obstacleData.baseHeight = Math.random() * 80 + 80;
+
+  obstacle.style.bottom = obstacleData.baseHeight + "px";
+
+  obstacleData.waveSpeed = Math.random() * 0.15 + 0.05;
+
+  obstacleData.waveHeight = Math.random() * 30 + 20;
+}
+
+// --------------------
+// Move Obstacle
+// --------------------
+
+function moveObstacle(obstacleData) {
+
+  const obstacle = obstacleData.element;
+
+  const moveInterval = setInterval(() => {
+
     if (paused) return;
 
     if (gameOver) {
-      clearInterval(moveObstacle);
+
+      clearInterval(moveInterval);
 
       return;
     }
 
-    obstacleLeft -= speed;
+    obstacleData.left -= speed;
 
-    obstacle.style.left = obstacleLeft + "px";
+    obstacle.style.left = obstacleData.left + "px";
 
-    // --------------------
-    // Bird Wave Animation
-    // --------------------
-
+    // Bird animation
     if (obstacle.classList.contains("flying")) {
-      waveAngle += waveSpeed;
 
-      let waveY = Math.sin(waveAngle) * waveHeight;
-
-      obstacle.style.bottom = baseHeight + waveY + "px";
+      animateBird(obstacleData);
     }
 
-    // --------------------
-    // Collision Detection
-    // --------------------
+    // Collision
+    if (checkCollision(obstacleData)) {
 
-    const characterBottom = parseInt(
-      window.getComputedStyle(character).getPropertyValue("bottom")
-    );
-
-    const characterLeft = 95;
-    const characterWidth = 35;
-    const characterHeight = 45;
-
-    const obstacleWidth = parseInt(
-      window.getComputedStyle(obstacle).getPropertyValue("width")
-    );
-
-    const obstacleHeight = parseInt(
-      window.getComputedStyle(obstacle).getPropertyValue("height")
-    );
-
-    const obstacleBottom = parseInt(
-      window.getComputedStyle(obstacle).getPropertyValue("bottom")
-    );
-
-    const characterTop = characterBottom + characterHeight;
-
-    const obstacleTop = obstacleBottom + obstacleHeight;
-
-    const horizontalCollision =
-      obstacleLeft < characterLeft + characterWidth &&
-      obstacleLeft + obstacleWidth > characterLeft;
-
-    const verticalCollision =
-      characterBottom < obstacleTop && characterTop > obstacleBottom;
-
-    // Game Over
-    if (horizontalCollision && verticalCollision) {
-      gameOver = true;
-
-      bgMusic.pause();
-
-      gameOverSound.play();
-
-      finalScore.textContent = score;
-
-      gameOverScreen.style.display = "flex";
-
-      // Save High Score
-      if (score > highScore) {
-        localStorage.setItem("highScore", score);
-
-        highScoreDisplay.textContent = score;
-      }
+      endGame();
     }
 
-    // --------------------
-    // Remove Obstacle
-    // --------------------
+    // Remove obstacle
+    if (obstacleData.left < -50) {
 
-    if (obstacleLeft < -50) {
-      clearInterval(moveObstacle);
-
-      obstacle.remove();
-
-      score++;
-
-      scoreDisplay.textContent = score;
-
-      // Increase Difficulty
-      if (score % 5 === 0) {
-        speed += 1;
-      }
+      removeObstacle(obstacleData, moveInterval);
     }
+
   }, 20);
-
-
-  // --------------------
-  // Create Next Obstacle
-  // --------------------
-
-  const randomTime = Math.random() * 2000 + 1200;
-
-  setTimeout(createObstacle, randomTime);
 }
 
+// --------------------
+// Animate Bird
+// --------------------
+
+function animateBird(obstacleData) {
+
+  const obstacle = obstacleData.element;
+
+  obstacleData.waveAngle += obstacleData.waveSpeed;
+
+  let waveY =
+    Math.sin(obstacleData.waveAngle) *
+    obstacleData.waveHeight;
+
+  obstacle.style.bottom =
+    obstacleData.baseHeight + waveY + "px";
+}
+
+// --------------------
+// Collision Detection
+// --------------------
+
+function checkCollision(obstacleData) {
+
+  const obstacle = obstacleData.element;
+
+  const characterBottom = parseInt(
+    window.getComputedStyle(character).getPropertyValue("bottom")
+  );
+
+  const characterLeft = 95;
+  const characterWidth = 35;
+  const characterHeight = 45;
+
+  const obstacleWidth = parseInt(
+    window.getComputedStyle(obstacle).getPropertyValue("width")
+  );
+
+  const obstacleHeight = parseInt(
+    window.getComputedStyle(obstacle).getPropertyValue("height")
+  );
+
+  const obstacleBottom = parseInt(
+    window.getComputedStyle(obstacle).getPropertyValue("bottom")
+  );
+
+  const characterTop = characterBottom + characterHeight;
+
+  const obstacleTop = obstacleBottom + obstacleHeight;
+
+  const horizontalCollision =
+    obstacleData.left < characterLeft + characterWidth &&
+    obstacleData.left + obstacleWidth > characterLeft;
+
+  const verticalCollision =
+    characterBottom < obstacleTop &&
+    characterTop > obstacleBottom;
+
+  return horizontalCollision && verticalCollision;
+}
+
+// --------------------
+// End Game
+// --------------------
+
+function endGame() {
+
+  gameOver = true;
+
+  bgMusic.pause();
+
+  gameOverSound.play();
+
+  finalScore.textContent = score;
+
+  gameOverScreen.style.display = "flex";
+
+  // Save High Score
+  if (score > highScore) {
+
+    localStorage.setItem("highScore", score);
+
+    highScoreDisplay.textContent = score;
+  }
+}
+
+// --------------------
+// Remove Obstacle
+// --------------------
+
+function removeObstacle(obstacleData, interval) {
+
+  clearInterval(interval);
+
+  obstacleData.element.remove();
+
+  score++;
+
+  scoreDisplay.textContent = score;
+
+  // Increase difficulty
+  if (score % 5 === 0) {
+
+    speed += 1;
+  }
+}
+
+// --------------------
+// Spawn Next Obstacle
+// --------------------
+
+function spawnNextObstacle() {
+
+  const randomTime =
+    Math.random() * 2000 + 1200;
+
+  setTimeout(createObstacle, randomTime);
+};
 
 // --------------------
 // Button Controls
@@ -376,7 +456,6 @@ restartBtn.addEventListener("click", () => {
 playAgainBtn.addEventListener("click", () => {
   restartGame();
 });
-
 
 // --------------------
 // Keyboard Controls
