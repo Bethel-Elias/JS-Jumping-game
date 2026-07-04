@@ -177,6 +177,11 @@ function createObstacle() {
 
   const obstacleType = Math.random();
 
+  let waveAngle = 0;
+  let waveSpeed = 0;
+  let waveHeight = 0;
+  let baseHeight = 0;
+
   // CACTUS
   if (obstacleType < 0.4) {
 
@@ -217,11 +222,11 @@ function createObstacle() {
     obstacle.style.bottom = baseHeight + "px";
 
     // Bird Wave Movement
-    var waveAngle = 0;
+     waveAngle = 0;
 
-    var waveSpeed = Math.random() * 0.15 + 0.05;
+     waveSpeed = Math.random() * 0.15 + 0.05;
 
-    var waveHeight = Math.random() * 30 + 20;
+     waveHeight = Math.random() * 30 + 20;
   }
 
   game.appendChild(obstacle);
@@ -256,7 +261,7 @@ function createObstacle() {
 
       let waveY = Math.sin(waveAngle) * waveHeight;
 
-      obstacle.style.bottom = waveHeight + waveY + "px";
+      obstacle.style.bottom = baseHeight + waveY + "px";
     }
 
     // --------------------
